@@ -10,6 +10,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
+
       - name: Create wrangler.toml
         env:
           USERNAME: ${{ secrets.USERNAME || '_user' }}
@@ -21,7 +22,11 @@ jobs:
               -e "s/\$BUCKET_NAME/$BUCKET_NAME/g" \
               wrangler.toml.template > wrangler.toml
           cat wrangler.toml
-      - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      - name: Install Wrangler
+        run: npm install wrangler@4
+
+      - name: Deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler deploy
