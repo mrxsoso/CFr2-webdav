@@ -1,18 +1,15 @@
 name: Deploy to Cloudflare Workers
-
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v5          # v4 → v5
-
+      - uses: actions/checkout@v5
       - name: Create wrangler.toml
         env:
           USERNAME: ${{ secrets.USERNAME || '_user' }}
@@ -24,8 +21,9 @@ jobs:
               -e "s/\$BUCKET_NAME/$BUCKET_NAME/g" \
               wrangler.toml.template > wrangler.toml
           cat wrangler.toml
-
       - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v4   # v3 → v4
+        uses: cloudflare/wrangler-action@v4
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
